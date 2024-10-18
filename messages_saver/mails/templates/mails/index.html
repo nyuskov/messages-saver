@@ -1,4 +1,10 @@
 {% extends "mails/base.html" %}
+{% load static %}
+
+{% block script %}
+    <script src="{% static 'mails/js/jquery-3.7.1.min.js' %}" type="text/javascript"></script>
+    <script src="{% static 'mails/js/main.js' %}" type="text/javascript"></script>
+{% endblock %}
 {% block title %}
    Main
 {% endblock %}

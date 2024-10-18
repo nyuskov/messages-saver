@@ -43,6 +43,14 @@ async def get_connection():
         raise Exception(auth.lines)
 
 
+async def get_info():
+    pass
+
+
+async def get_progress():
+    pass
+
+
 async def get_messages():
     # Server options
     imap_client = await get_connection()

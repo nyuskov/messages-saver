@@ -2,6 +2,7 @@ import email
 import base64
 import datetime
 
+from asgiref.sync import sync_to_async
 from django.core.files.base import ContentFile
 from aioimaplib import aioimaplib
 from .models import Profile, Message, Attachment
@@ -12,7 +13,9 @@ async def save_attachment(attachment_name, attachment_bytes, message):
         message=message
     )
 
-    new_attachment.data.save(attachment_name, ContentFile(attachment_bytes))
+    await sync_to_async(new_attachment.data.save)(
+        str(attachment_name),
+        ContentFile(attachment_bytes))
 
 
 async def get_connection():
@@ -22,9 +25,9 @@ async def get_connection():
     password = profile.password
     port = 993
 
-    if 'yandex' in profile.email:
+    if "yandex" in profile.email:
         host = "imap.yandex.ru"
-    elif 'gmail' in profile.email:
+    elif "gmail" in profile.email:
         host = "imap.gmail.com"
     else:
         host = "imap.mail.ru"
@@ -45,9 +48,9 @@ async def get_messages():
     imap_client = await get_connection()
 
     # Search messages
+    res, data = await imap_client.select()
     res, data = await imap_client.search('ALL')
     message_numbers = data[0].split()
-    message_ids = Message.objects.values_list("message_id", flat=True)
 
     for message_number in message_numbers[:5]:
         # Print messages
@@ -60,7 +63,7 @@ async def get_messages():
         letter_id = msg["Message-ID"]
         # letter_from = msg["Return-path"]
 
-        if letter_id in message_ids:
+        if await Message.objects.filter(message_id__contains=letter_id).acount():
             continue
 
         if msg["Subject"]:

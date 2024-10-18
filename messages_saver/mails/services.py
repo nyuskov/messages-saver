@@ -47,10 +47,11 @@ async def get_info():
     pass
 
 
-async def get_messages():
+async def get_messages(last_message_id):
     messages = []
-    async for message in Message.objects.all():
+    async for message in Message.objects.all()[last_message_id:]:
         messages.append({
+            "id": message.id,
             "message_id": message.message_id,
             "subject": message.subject,
             "text": message.text[:20],
@@ -60,7 +61,7 @@ async def get_messages():
         })
         async for attachment in message.attachment_set.all():
             messages[-1]["attachments"].append({
-                "name": attachment.data.name,
+                "name": str(attachment.data.name),
                 "data": str(attachment.data.read())
             })
 

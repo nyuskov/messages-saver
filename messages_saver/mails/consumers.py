@@ -10,7 +10,8 @@ class MessageConsumer(AsyncConsumer):
         await self.send({"type": "websocket.accept"})
 
     async def websocket_receive(self, text_data):
-        message = json.loads(text_data['text']).get("message")
+        data = json.loads(text_data['text'])
+        message = data.get("message")
         if message == "info":
             text = {
                 "info": await get_info()
@@ -21,7 +22,8 @@ class MessageConsumer(AsyncConsumer):
             }
         else:
             text = {
-                "messages": await get_messages()
+                "messages": await get_messages(
+                    data.get("last_message_id", 0))
             }
 
         await self.send({

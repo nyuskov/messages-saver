@@ -7,8 +7,8 @@ from aioimaplib import aioimaplib
 from .models import Profile, Message, Attachment
 
 
-def save_attachment(attachment_name, attachment_bytes, message):
-    new_attachment = Attachment(
+async def save_attachment(attachment_name, attachment_bytes, message):
+    new_attachment = await Attachment.objects.acreate(
         message=message
     )
 
@@ -17,7 +17,7 @@ def save_attachment(attachment_name, attachment_bytes, message):
 
 async def get_connection():
     # Server options
-    profile = Profile.get()
+    profile = await Profile.objects.aget()
     user = profile.login
     password = profile.password
     port = 993
@@ -81,7 +81,7 @@ async def get_messages():
 
             # TODO: add BeautifulSoup parsing for html
 
-        message = Message.objects.create(
+        message = await Message.objects.acreate(
             message_id=letter_id,
             user=imap_client.user,
             subject=letter_subject,
@@ -91,7 +91,7 @@ async def get_messages():
         )
 
         for letter_attachment in letter_attachments:
-            save_attachment(*letter_attachment, message)
+            await save_attachment(*letter_attachment, message)
 
     # Logout
     await imap_client.logout()

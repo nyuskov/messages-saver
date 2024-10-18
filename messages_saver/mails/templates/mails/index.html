@@ -1,0 +1,17 @@
+{% extends "mails/base.html" %}
+{% block title %}
+   Main
+{% endblock %}
+{% block content %}
+    <h2>Progress bar</h2>
+    <div id="progressBar"></div>
+    <p></p>
+    <h2>Email account</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+    <p></p>
+    <h2>Messages</h2>
+{% endblock %}

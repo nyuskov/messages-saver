@@ -12,15 +12,21 @@ class MessageConsumer(AsyncConsumer):
     async def websocket_receive(self, text_data):
         message = json.loads(text_data['text']).get("message")
         if message == "info":
-            text = await get_info()
+            text = {
+                "info": await get_info()
+            }
         elif message == "progress":
-            text = await get_progress()
+            text = {
+                "progress": await get_progress()
+            }
         else:
-            text = await get_messages()
+            text = {
+                "messages": await get_messages()
+            }
 
         await self.send({
             "type": "websocket.send",
-            "text": text
+            "text": json.dumps(text)
         })
 
     async def websocket_disconnect(self, event):

@@ -47,11 +47,57 @@ async def get_info():
     pass
 
 
-async def get_progress():
-    pass
-
-
 async def get_messages():
+    messages = []
+    async for message in Message.objects.all():
+        messages.append({
+            "message_id": message.message_id,
+            "subject": message.subject,
+            "text": message.text[:20],
+            "sended_at": str(message.sended_at),
+            "received_at": str(message.received_at),
+            "attachments": []
+        })
+        async for attachment in message.attachment_set.all():
+            messages[-1]["attachments"].append({
+                "name": attachment.data.name,
+                "data": str(attachment.data.read())
+            })
+
+    return messages
+
+
+async def get_progress():
+    # Server options
+    imap_client = await get_connection()
+
+    # Search messages
+    res, data = await imap_client.select()
+    res, data = await imap_client.search('ALL')
+    message_numbers = data[0].split()
+
+    progress = 100
+    for i, message_number in enumerate(message_numbers):
+        # Print messages
+        res, data = await imap_client.fetch(int(message_number), '(RFC822)')
+
+        # Get message
+        msg = email.message_from_bytes(data[1])
+
+        letter_id = msg["Message-ID"]
+
+        if not await Message.objects.filter(
+                message_id__contains=letter_id).acount():
+            progress = f"{len(message_numbers) / (i+1):.2f}"
+            break
+
+    # Logout
+    await imap_client.logout()
+
+    return progress
+
+
+async def download_messages():
     # Server options
     imap_client = await get_connection()
 

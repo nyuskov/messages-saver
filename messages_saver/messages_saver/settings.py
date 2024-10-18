@@ -34,7 +34,6 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split() if os.environ.get
 INSTALLED_APPS = [
     'daphne',
     'channels',
-    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

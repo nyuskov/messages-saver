@@ -1,16 +1,17 @@
 from django.db import models
 
 
-class MailUser(models.Model):
+class Profile(models.Model):
     email = models.CharField(max_length=254)
     login = models.CharField(max_length=120)
     password = models.CharField(max_length=50)
 
 
 class Message(models.Model):
-    user = models.ForeignKey(MailUser, on_delete=models.CASCADE)
-    title = models.CharField(max_length=120)
-    description = models.TextField()
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    message_id = models.CharField(max_length=998)
+    subject = models.CharField(max_length=50)
+    text = models.TextField()
     sended_at = models.DateTimeField()
     received_at = models.DateTimeField()
 
